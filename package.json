@@ -3,13 +3,14 @@
   "name": "seo-rag",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "preprocess": "tsx scripts/preprocess.ts"
   },
   "dependencies": {
     "@langchain/openai": "^1.2.3",
@@ -32,6 +33,7 @@
     "@typescript-eslint/parser": "^8.54.0",
     "eslint": "^9",
     "eslint-config-next": "^16.1.5",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
