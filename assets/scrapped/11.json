@@ -1,0 +1,26 @@
+{
+  "timestamp": "2024-05-20T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "pizza dough hydration tips",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "Expert Advice: Pizza Dough Hydration",
+      "link": "https://expertpizzachef.com/dough-hydration",
+      "snippet": "Top chefs share their favorite hydration ratios for different pizza styles.",
+      "position": 1
+    },
+    {
+      "title": "Hydration Myths Debunked",
+      "link": "https://pizzamyths.com/hydration-facts",
+      "snippet": "We separate fact from fiction about water content in pizza dough.",
+      "position": 2
+    }
+  ],
+  "peopleAlsoAsk": [
+    { "question": "Does altitude affect dough hydration?" },
+    { "question": "What is the best hydration for crispy crust?" }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "timestamp": "2024-06-10T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "pizza oven",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "Pizza Oven Buying Guide",
+      "link": "https://ovenexperts.com/buying-guide",
+      "snippet": "Find the right pizza oven for your needs: wood-fired, gas, or electric."
+    },
+    {
+      "title": "Top 10 Pizza Ovens for Home Use",
+      "link": "https://pizzalovers.com/top10-ovens",
+      "snippet": "Our editors review the best pizza ovens for home cooks in 2024."
+    },
+    {
+      "title": "How to Choose a Pizza Oven",
+      "link": "https://kitchenadvice.com/choose-pizza-oven",
+      "snippet": "Key features to consider when selecting a pizza oven for your kitchen or backyard."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "timestamp": "2024-03-15T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "pizza dough hydration tips",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "How Hydration Affects Pizza Dough",
+      "link": "https://pizzascience.com/dough-hydration-guide",
+      "snippet": "Explore the science behind dough hydration and how it impacts texture and flavor.",
+      "position": 1
+    },
+    {
+      "title": "Best Hydration Ratios for Neapolitan Pizza",
+      "link": "https://neapolitanpizza.org/hydration-ratios",
+      "snippet": "A breakdown of hydration percentages and their effect on Neapolitan pizza crust.",
+      "position": 2
+    }
+  ],
+  "peopleAlsoAsk": [
+    { "question": "What is the ideal hydration for pizza dough?" },
+    { "question": "How does humidity affect pizza dough?" }
+  ]
+}

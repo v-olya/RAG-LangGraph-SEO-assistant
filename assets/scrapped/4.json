@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-06-01T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "best home pizza oven",
+    "type": "search"
+  },
+  "answerBox": {
+    "title": "Top 5 Home Pizza Ovens of 2025",
+    "answer": "The landscape is shifting toward electric indoor/outdoor hybrids. The Breville Smart Oven Pizzaiolo and the Ooni Volt 12 are currently the highest-rated for consistency.",
+    "snippet": "",
+    "link": "https://pizzatoday.com/reviews/top-ovens-2025"
+  },
+  "organic": [
+    {
+      "title": "The Best Pizza Ovens for Every Backyard and Kitchen",
+      "link": "https://pizzatoday.com/reviews/top-ovens-2025",
+      "snippet": "Our mid-year update. We've added 5 new electric models to our testing lab to see if they can match wood-fired results.",
+      "position": 1,
+      "date": null,
+      "sitelinks": [
+        {
+          "title": "Electric vs Gas"
+        },
+        {
+          "title": "Budget Picks"
+        }
+      ]
+    },
+    {
+      "title": "Ooni Koda vs Gozney Roccbox: The 2025 Showdown",
+      "link": "https://seriouspizzas.com/vs/ooni-vs-gozney",
+      "snippet": "We compare the two giants of the industry. Does the new Roccbox update take the crown?",
+      "position": 2,
+      "date": null,
+      "sitelinks": []
+    }
+  ],
+  "peopleAlsoAsk": [
+    {
+      "question": "Are electric pizza ovens as good as wood-fired?",
+      "snippet": "",
+      "link": null,
+      "title": null
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-04-01T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "home pizza oven",
+    "type": "search",
+    "engine": "google"
+  },
+  "answerBox": {
+    "title": "Best Home Pizza Ovens 2026",
+    "answer": "For home use, electric models like the Breville Fast Slow Pro are ideal for convenience and indoor cooking.",
+    "snippet": "Our top picks for home pizza ovens include countertop electric options...",
+    "link": "https://kitchengear.com/reviews/best-home-pizza-ovens"
+  },
+  "organic": [
+    {
+      "title": "10 Best Home Pizza Ovens for Indoor Use",
+      "link": "https://palapizza.com/review/best-home-pizza-ovens",
+      "snippet": "We rank the top indoor pizza ovens for home kitchens. Includes Breville, Ooni electric, and more.",
+      "position": 1,
+      "date": "Apr 1, 2026",
+      "sitelinks": []
+    },
+    {
+      "title": "Shop Home Pizza Ovens - Countertop Models",
+      "link": "https://outdoor-kitchen.com/shop/home-pizza-ovens",
+      "snippet": "Compact and efficient pizza ovens for home use. Free shipping available!",
+      "position": 2,
+      "date": null,
+      "sitelinks": []
+    }
+  ],
+  "peopleAlsoAsk": [
+    {
+      "question": "Can I use a pizza oven indoors?",
+      "snippet": "",
+      "link": null,
+      "title": null
+    },
+    {
+      "question": "What is the best electric pizza oven for home?",
+      "snippet": "",
+      "link": null,
+      "title": null
+    }
+  ],
+  "relatedSearches": [
+    {
+      "query": "best countertop pizza oven"
+    },
+    {
+      "query": "indoor pizza oven reviews"
+    }
+  ]
+}

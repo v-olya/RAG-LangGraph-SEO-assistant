@@ -1,0 +1,30 @@
+{
+  "timestamp": "2024-11-15T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "neapolitan pizza recipe",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "Neapolitan Pizza: The Classic Recipe",
+      "link": "https://italianfoodlab.com/neapolitan-pizza-recipe",
+      "snippet": "Learn the original Neapolitan pizza recipe with step-by-step instructions and tips from Italian chefs.",
+      "position": 1
+    },
+    {
+      "title": "How to Make Neapolitan Pizza at Home",
+      "link": "https://homemadepizza.com/neapolitan-guide",
+      "snippet": "A home cook's guide to achieving the perfect Neapolitan crust and flavor.",
+      "position": 2
+    }
+  ],
+  "peopleAlsoAsk": [
+    {
+      "question": "What flour is best for Neapolitan pizza?"
+    },
+    {
+      "question": "How hot should the oven be for Neapolitan pizza?"
+    }
+  ]
+}

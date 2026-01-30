@@ -1,0 +1,25 @@
+{
+  "timestamp": "2024-08-18T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "neapolitan pizza",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "What Makes Neapolitan Pizza Unique?",
+      "link": "https://pizzatheory.io/neapolitan-unique",
+      "snippet": "Discover the history, ingredients, and techniques behind true Neapolitan pizza."
+    },
+    {
+      "title": "Best Neapolitan Pizza Spots in 2024",
+      "link": "https://foodtravel.com/best-neapolitan-pizza",
+      "snippet": "Our picks for the top Neapolitan pizza restaurants around the world."
+    },
+    {
+      "title": "Neapolitan Pizza Dough: Tips & Tricks",
+      "link": "https://doughmasters.com/neapolitan-tips",
+      "snippet": "How to master the perfect Neapolitan dough at home."
+    }
+  ]
+}

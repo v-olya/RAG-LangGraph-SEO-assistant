@@ -1,0 +1,25 @@
+{
+  "timestamp": "2024-09-05T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "authentic pizza",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "Authentic Italian Pizza: The Essentials",
+      "link": "https://italianfoodlab.com/authentic-pizza",
+      "snippet": "Learn what makes a pizza truly authentic, from dough to toppings."
+    },
+    {
+      "title": "Traditional Pizza Techniques",
+      "link": "https://pizzatheory.io/traditional-techniques",
+      "snippet": "Explore classic methods for making pizza like in Naples."
+    },
+    {
+      "title": "Where to Eat Authentic Pizza in 2024",
+      "link": "https://foodtravel.com/authentic-pizza-2024",
+      "snippet": "Our guide to the best places for authentic pizza this year."
+    }
+  ]
+}

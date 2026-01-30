@@ -1,0 +1,55 @@
+{
+  "timestamp": "2024-01-05T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "best home pizza oven",
+    "type": "search",
+    "engine": "google"
+  },
+  "answerBox": {
+    "title": "Best Pizza Ovens 2024",
+    "answer": "The Ooni Koda 16 and Gozney Roccbox remain the top picks for 2024 due to their heat retention and ease of use.",
+    "snippet": "After testing 20 models, the Ooni Koda 16 is our best overall pick...",
+    "link": "https://kitchengear.com/reviews/best-pizza-ovens"
+  },
+  "organic": [
+    {
+      "title": "10 Best Outdoor Pizza Ovens for 2024",
+      "link": "https://palapizza.com/review/best-pizza-ovens",
+      "snippet": "We rank the top outdoor pizza ovens for any budget. Includes Ooni, Gozney, and Solo Stove.",
+      "position": 1,
+      "date": "Jan 5, 2024",
+      "sitelinks": []
+    },
+    {
+      "title": "Shop Outdoor Pizza Ovens - Free Shipping",
+      "link": "https://outdoor-kitchen.com/shop/pizza-ovens",
+      "snippet": "Huge selection of portable and wood-fired pizza ovens. Order today!",
+      "position": 2,
+      "date": null,
+      "sitelinks": []
+    }
+  ],
+  "peopleAlsoAsk": [
+    {
+      "question": "Is Ooni better than Gozney?",
+      "snippet": "",
+      "link": null,
+      "title": null
+    },
+    {
+      "question": "Are home pizza ovens worth it?",
+      "snippet": "",
+      "link": null,
+      "title": null
+    }
+  ],
+  "relatedSearches": [
+    {
+      "query": "cheap pizza oven for backyard"
+    },
+    {
+      "query": "indoor electric pizza oven reviews"
+    }
+  ]
+}

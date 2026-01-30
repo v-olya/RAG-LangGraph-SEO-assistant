@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-01-01T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "best home pizza oven",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "Best Pizza Ovens of 2026 | Lab Tested & Ranked",
+      "link": "https://techgearlab.com/topics/kitchen/best-pizza-oven",
+      "snippet": "Our 2026 rankings are live. We focus on temperature consistency and 'snap' results for Neapolitan styles.",
+      "position": 1,
+      "date": null,
+      "sitelinks": [
+        {
+          "title": "Best Overall: Gozney Arc"
+        },
+        {
+          "title": "Best Value: Solo Pi Prime"
+        }
+      ]
+    },
+    {
+      "title": "13 Best Pizza Ovens Tested by Experts (2026 Update)",
+      "link": "https://gardenersworld.com/reviews/best-pizza-ovens",
+      "snippet": "From the ProCook Outdoor to the Ooni Karu, we test for heat-up time and ease of assembly.",
+      "position": 2,
+      "date": null,
+      "sitelinks": []
+    }
+  ],
+  "peopleAlsoAsk": [
+    {
+      "question": "What is the most reliable home pizza oven in 2026?",
+      "snippet": "",
+      "link": null,
+      "title": null
+    }
+  ],
+  "aiOverview": {
+    "answer": "In 2026, the best home pizza ovens prioritize multi-fuel versatility and digital precision. The Gozney Arc and Ooni Karu 2 are leaders in the 14-inch category.",
+    "sourceLinks": [
+      {
+        "title": "Top Lab Tested Ovens",
+        "link": "https://techgearlab.com/topics/kitchen/best-pizza-oven"
+      }
+    ]
+  }
+}

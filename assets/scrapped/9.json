@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-05-10T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "pizza near me",
+    "type": "search",
+    "location": "New York, NY"
+  },
+  "organic": [
+    {
+      "title": "Best Pizza Places in NYC (2023)",
+      "link": "https://nycpizzaguide.com/best-pizza-nyc",
+      "snippet": "From classic slices to modern pies, these are the must-try pizza spots in New York City this year.",
+      "position": 1
+    },
+    {
+      "title": "Top 10 Pizza Restaurants in Manhattan",
+      "link": "https://manhattanfoodie.com/top10-pizza",
+      "snippet": "Our editors pick the best pizza restaurants in Manhattan for 2023.",
+      "position": 2
+    }
+  ],
+  "localResults": [
+    {
+      "title": "Joe's Pizza",
+      "rating": 4.8,
+      "reviews": 2100,
+      "address": "7 Carmine St, New York, NY",
+      "tags": ["Classic", "Takeout"]
+    },
+    {
+      "title": "Prince Street Pizza",
+      "rating": 4.7,
+      "reviews": 1800,
+      "address": "27 Prince St, New York, NY",
+      "tags": ["Spicy Pepperoni", "No Reservations"]
+    }
+  ]
+}

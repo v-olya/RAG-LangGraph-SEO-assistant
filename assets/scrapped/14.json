@@ -1,0 +1,25 @@
+{
+  "timestamp": "2024-07-12T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "pizza recipe",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "Classic Margherita Pizza Recipe",
+      "link": "https://italianfoodlab.com/margherita-recipe",
+      "snippet": "Step-by-step guide to making authentic Margherita pizza at home."
+    },
+    {
+      "title": "Easy Homemade Pizza Dough",
+      "link": "https://doughmasters.com/easy-pizza-dough",
+      "snippet": "Simple recipe for soft, chewy pizza dough with just 5 ingredients."
+    },
+    {
+      "title": "Creative Pizza Toppings for 2024",
+      "link": "https://pizzacreators.com/toppings-2024",
+      "snippet": "Explore new topping ideas to elevate your homemade pizza."
+    }
+  ]
+}

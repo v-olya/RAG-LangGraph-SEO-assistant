@@ -1,0 +1,38 @@
+{
+  "timestamp": "2024-02-10T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "authentic neapolitan pizza recipe",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "My 72-Hour Dough Journey: Lessons from Naples",
+      "link": "https://reddit.com/r/Pizza/comments/dough_journey",
+      "snippet": "After 3 weeks in Italy, I realized my hydration was all wrong. Here is the true ratio...",
+      "position": 1,
+      "date": null,
+      "sitelinks": []
+    },
+    {
+      "title": "Authentic Neapolitan Pizza Recipe (AVPN Standard)",
+      "link": "https://pizzacraft.com/blog/authentic-recipe",
+      "snippet": "The official guidelines for dough, toppings, and wood-fired oven temperatures.",
+      "position": 2,
+      "date": null,
+      "sitelinks": []
+    }
+  ],
+  "relatedSearches": [
+    {
+      "query": "neapolitan pizza dough hydration calculator"
+    }
+  ],
+  "knowledgeGraph": {
+    "title": "Neapolitan Pizza",
+    "type": "Pizza style",
+    "description": "Neapolitan pizza, or pizza napoletana, is a type of pizza that originated in Naples, Italy.",
+    "website": null,
+    "imageUrl": null
+  }
+}

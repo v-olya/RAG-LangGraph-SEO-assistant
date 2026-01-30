@@ -1,0 +1,26 @@
+{
+  "timestamp": "2024-08-05T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "pizza oven reviews",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "2022 Pizza Oven Review Roundup",
+      "link": "https://kitcheninsider.com/pizza-oven-reviews-2022",
+      "snippet": "We tested 12 pizza ovens for heat, speed, and crust quality. The Ooni Fyra 12 and Roccbox were standouts.",
+      "position": 1
+    },
+    {
+      "title": "Which Pizza Oven is Right for You?",
+      "link": "https://pizzalovers.net/choose-your-oven",
+      "snippet": "From wood-fired to electric, we break down the pros and cons of each pizza oven type.",
+      "position": 2
+    }
+  ],
+  "relatedSearches": [
+    { "query": "portable pizza oven" },
+    { "query": "pizza oven for apartment" }
+  ]
+}

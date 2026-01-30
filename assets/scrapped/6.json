@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-03-01T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "italian pizza near me",
+    "type": "search",
+    "location": "Prague, Czechia"
+  },
+  "organic": [
+    {
+      "title": "10 Best Authentic Italian Pizzerias in Prague 2026",
+      "link": "https://praguetoday.cz/food/best-pizza",
+      "snippet": "From London to Paris, these spots use imported Italian flour and San Marzano tomatoes.",
+      "position": 1,
+      "date": null,
+      "sitelinks": []
+    }
+  ],
+  "localResults": [
+    {
+      "title": "Dream Pizza",
+      "rating": 4.9,
+      "reviews": 1250,
+      "address": "London",
+      "tags": [
+        "Dine-in",
+        "Takeout",
+        "Wood-fired"
+      ],
+      "position": 1
+    },
+    {
+      "title": "L'Osteria",
+      "rating": 4.5,
+      "reviews": 3400,
+      "address": "Paris",
+      "tags": [
+        "Large Pizzas",
+        "Outdoor Seating"
+      ],
+      "position": 2
+    }
+  ]
+}

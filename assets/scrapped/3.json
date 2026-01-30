@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-02-01T00:00:00Z",
+  "cluster": "pizza",
+  "searchParameters": {
+    "q": "authentic neapolitan pizza recipe",
+    "type": "search"
+  },
+  "organic": [
+    {
+      "title": "UNESCO Neapolitan Pizza: The Official Guide",
+      "link": "https://pizzatheory.io/guides/neapolitan-masterclass",
+      "snippet": "Master the 72-hour cold ferment and the UNESCO-recognized 'slap' technique.",
+      "position": 1,
+      "date": null,
+      "sitelinks": []
+    },
+    {
+      "title": "Real Italian Pizza spots - Reddit Discussion",
+      "link": "https://reddit.com/r/Pizza/best_places",
+      "snippet": "Users discuss why high-hydration dough is winning in 2026...",
+      "position": 2,
+      "date": null,
+      "sitelinks": []
+    }
+  ],
+  "videoResults": [
+    {
+      "title": "How to Stretch Pizza Dough Like a Pro",
+      "link": "https://youtube.com/watch?v=demo",
+      "duration": "10:15"
+    }
+  ]
+}
