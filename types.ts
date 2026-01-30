@@ -1,0 +1,85 @@
+export type SerpFeature = 'organic' | 'answerBox' | 'peopleAlsoAsk' | 'relatedSearches' | 'aiOverview' | 'localResults' | 'videoResults' | 'knowledgeGraph';
+
+export interface SerpData {
+  searchParameters: { q: string };
+  timestamp: string;
+  cluster?: string;
+  organic?: OrganicResult[];
+  answerBox?: AnswerBox;
+  peopleAlsoAsk?: PeopleAlsoAsk[];
+  relatedSearches?: RelatedSearch[];
+  aiOverview?: AiOverview;
+  localResults?: LocalResult[];
+  videoResults?: VideoResult[];
+  knowledgeGraph?: KnowledgeGraph;
+}
+
+export interface OrganicResult {
+  position: number;
+  title: string;
+  snippet: string;
+  link: string;
+  date?: string;
+}
+
+export interface AnswerBox {
+  title: string;
+  answer: string;
+  snippet: string;
+  link: string;
+}
+
+export interface PeopleAlsoAsk {
+  question: string;
+  snippet?: string;
+  link?: string;
+}
+
+export interface RelatedSearch {
+  query: string;
+}
+
+export interface AiOverview {
+  answer: string;
+  sourceLinks?: { title: string; link: string }[];
+}
+
+export interface LocalResult {
+  position: number;
+  title: string;
+  address: string;
+  rating: number;
+  reviews: number;
+  tags?: string[];
+}
+
+export interface VideoResult {
+  title: string;
+  duration: string;
+  link?: string;
+}
+
+export interface KnowledgeGraph {
+  title: string;
+  type?: string;
+  description?: string;
+  website?: string;
+}
+
+export interface SerpMetadata {
+  iso_date: string;
+  serp_features: string[];
+  cluster: string | null;
+  query: string;
+  type: string;
+  serp_id: string;
+  position?: number;
+  domain?: string;
+  categories?: string[];
+}
+
+export interface PageHeaders {
+  h1: string | null;
+  h2: string[];
+  h3: string[];
+}
