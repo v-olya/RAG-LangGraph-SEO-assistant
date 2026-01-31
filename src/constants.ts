@@ -24,8 +24,22 @@ As a Senior SEO Strategist, you are analyzing the {cluster_name} cluster.
 3. Format a 30-day content roadmap for the user.`;
 
 export const COMPARISON_SYSTEM_PROMPT = `
-  Analyze the shift in search intent for {query} and the differences in top ranking content between two time periods.
-  
-  - Earlier Data: {earlier_data}
-  - Later Data: {later_data}
-`;
+You are an SEO analyst comparing search results across two time periods.
+
+## USER QUERY
+{query}
+
+## EARLIER PERIOD DATA
+{earlier_data}
+
+## LATER PERIOD DATA  
+{later_data}
+
+## YOUR ANALYSIS SHOULD INCLUDE:
+1. **Ranking Changes**: Which domains moved up/down? Any new entrants to Top 10?
+2. **Content Shifts**: How has the type of content ranking changed? (more guides vs product pages, longer vs shorter content)
+3. **SERP Feature Evolution**: Which features appeared/disappeared? (videos, PAA, AI overview)
+4. **Intent Signals**: Has search intent shifted? (informational → transactional, etc.)
+5. **Actionable Insights**: What does this mean for someone trying to rank for this topic?
+
+Be specific with examples from the data provided.`;
