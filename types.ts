@@ -1,4 +1,4 @@
-export type SerpFeature = 'organic' | 'answerBox' | 'peopleAlsoAsk' | 'relatedSearches' | 'aiOverview' | 'localResults' | 'videoResults' | 'knowledgeGraph';
+export type SerpFeature = 'organic' | 'answerBox' | 'peopleAlsoAsk' | 'relatedSearches' | 'aiOverview' | 'localResults' | 'videoResults' | 'knowledgeGraph' | 'images' | 'news';
 
 export interface SerpData {
   searchParameters: { q: string };
@@ -12,13 +12,15 @@ export interface SerpData {
   localResults?: LocalResult[];
   videoResults?: VideoResult[];
   knowledgeGraph?: KnowledgeGraph;
+  images?: ImageResult[];
+  news?: NewsResult[];
 }
 
 export interface OrganicResult {
   position: number;
-  title: string;
-  snippet: string;
-  link: string;
+  title?: string;
+  snippet?: string;
+  link?: string;
   date?: string;
 }
 
@@ -66,6 +68,29 @@ export interface KnowledgeGraph {
   website?: string;
 }
 
+export interface ImageResult {
+  title: string;
+  imageUrl: string;
+  imageWidth: number;
+  imageHeight: number;
+  thumbnailUrl: string;
+  thumbnailWidth: number;
+  thumbnailHeight: number;
+  source: string;
+  domain: string;
+  link: string;
+  googleUrl: string;
+  position: number;
+}
+
+export interface NewsResult {
+  title: string;
+  link: string;
+  snippet: string;
+  date: string;
+  source: string;
+}
+
 export interface SerpMetadata {
   iso_date: string;
   serp_features: string[];
@@ -82,4 +107,18 @@ export interface PageHeaders {
   h1: string | null;
   h2: string[];
   h3: string[];
+}
+
+export interface SerperResponse {
+  searchParameters: { q: string };
+  organic?: OrganicResult[];
+  answerBox?: AnswerBox;
+  peopleAlsoAsk?: PeopleAlsoAsk[];
+  relatedSearches?: RelatedSearch[];
+  aiOverview?: AiOverview;
+  localResults?: LocalResult[];
+  videoResults?: VideoResult[];
+  knowledgeGraph?: KnowledgeGraph;
+  // Allow any other properties
+  [key: string]: unknown;
 }
