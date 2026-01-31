@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
-    "preprocess": "tsx scripts/preprocess.ts"
+    "preprocess": "tsx scripts/preprocess.ts",
+    "get-serp": "tsx scripts/getSerp.ts"
   },
   "dependencies": {
     "@langchain/openai": "^1.2.3",
