@@ -2,6 +2,7 @@ import { readFile, writeFile, readdir } from 'fs/promises';
 import { join } from 'path';
 import { normalizeSerperResponse } from '../utils/normalizeResponse';
 import type { SerpData } from '../src/types';
+import { sleep } from '../utils/fetchUtils';
 
 async function callSerper(query: string, apiKey: string) {
   const endpoint = 'https://google.serper.dev/search';
@@ -48,13 +49,19 @@ async function run() {
 
         const normalized = normalizeSerperResponse(serperResp as unknown as Record<string, unknown>, q, cluster);
 
+        if (normalized == null) {
+          console.log(`- Skipping save for query "${q}" (inconsistent organic positions)`);
+          await sleep(600);
+          continue;
+        }
+
         const fileName = `${nextIndex}.json`;
         await writeFile(join(scrappedDir, fileName), JSON.stringify(normalized, null, 2));
         console.log(`✓ Saved ${fileName} for query: "${q}"`);
         nextIndex++;
 
         // gentle delay to avoid rate limits
-        await new Promise((r) => { globalThis.setTimeout(() => { r(undefined); }, 600); });
+        await sleep(600);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
         console.error(`✗ Failed for query "${q}": ${errorMsg}`);

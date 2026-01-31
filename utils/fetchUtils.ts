@@ -36,3 +36,6 @@ export async function fetchHeadings(url: string): Promise<PageHeaders> {
     };
   }
 }
+
+// Helper to pause without blocking the event loop. Uses globalThis to work in different JS environments.
+export const sleep = (ms: number) => new Promise<void>((res) => { globalThis.setTimeout(() => { res(); }, ms); });
