@@ -6,6 +6,7 @@ Write maintainable, performant, scalable and accessible code following these rul
 - Use strict type checking
 - Prefer type inference when the type is obvious
 - Avoid the `any` type; use `unknown` when type is uncertain
+- Never disable ESLint or TypeScript rules. Never!
 
 - Use functional components and React hooks
 - Use `useEffect` for side effects and cleanup
