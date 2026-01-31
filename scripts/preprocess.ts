@@ -1,10 +1,7 @@
 import { readdir, readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { slugify, decodeHTMLEntities } from '../utils/stringUtils';
-import { extractCategories, extractDomain } from '../utils/urlUtils';
-import { textualizeSerpFeatures } from '../utils/textUtils';
-import { fetchHeadings } from '../utils/fetchUtils';
-import { detectFeatures } from '../utils/normalizeResponse';
+import { buildSerpEntries } from '../utils/buildSerpEntries';
+import type { SerpData, ProcessedEntry } from '../src/types';
 
 async function preprocess() {
   console.log('preprocess start');
@@ -14,266 +11,19 @@ async function preprocess() {
   const files = await readdir(assetsDir);
   const jsonFiles = files.filter(f => f.endsWith('.json') && f !== 'clusters.json' && f !== 'processed.json');
 
-  const entries = [];
+  const entries: ProcessedEntry[] = [];
 
   for (const file of jsonFiles) {
     const filePath = join(assetsDir, file);
     const content = await readFile(filePath, 'utf-8');
-    const data = JSON.parse(content);
+    const data = JSON.parse(content) as SerpData;
     if (!data.organic || !Array.isArray(data.organic)) {
       console.log(`Skipping ${file} as organic is not an array`);
       continue;
     }
 
-    const isoDate = data.timestamp;
-    const cluster = data.cluster || null;
-    const slug = slugify(data.searchParameters && data.searchParameters.q ? data.searchParameters.q : '');
-    const serpId = `${slug}_${isoDate}`;
-    
-    // Detect SERP features present
-    const serpFeatures = detectFeatures(data);
-
-    // Process organic results
-    for (const organic of data.organic) {
-      // Skip organic results without links
-      if (!organic.link) continue;
-
-      const categories = extractCategories(organic.link);
-      const domain = extractDomain(organic.link);
-      const headers = await fetchHeadings(organic.link);
-      const entryId = `${slug}_${isoDate}_organic_${organic.position}`;
-      
-      const metadata = {
-        type: 'organic',
-        query: data.searchParameters.q,
-        position: organic.position,
-        iso_date: isoDate,
-        categories,
-        domain,
-        cluster,
-        serp_id: serpId,
-        serp_features: serpFeatures
-      };
-      
-      let text_blob = textualizeSerpFeatures('organic', data, organic, metadata, headers);
-      text_blob = decodeHTMLEntities(text_blob);
-
-      const entry = {
-        id: entryId,
-        text_blob,
-        metadata
-      };
-      entries.push(entry);
-    }
-
-    // Process answerBox
-    if (data.answerBox) {
-      const answerBoxMetadata = {
-        type: 'answerBox',
-        query: data.searchParameters.q,
-        iso_date: isoDate,
-        cluster,
-        serp_id: serpId,
-        serp_features: serpFeatures
-      };
-      let text_blob = textualizeSerpFeatures('answerBox', data, data.answerBox, answerBoxMetadata);
-      text_blob = decodeHTMLEntities(text_blob);
-      const entryId = `${slug}_${isoDate}_answerBox`;
-      const entry = {
-        id: entryId,
-        text_blob,
-        metadata: {
-          type: 'answerBox',
-          query: data.searchParameters.q,
-          iso_date: isoDate,
-          cluster,
-          serp_id: serpId,
-          serp_features: serpFeatures
-        }
-      };
-      entries.push(entry);
-    }
-
-    // Process peopleAlsoAsk
-    if (data.peopleAlsoAsk) {
-      for (let i = 0; i < data.peopleAlsoAsk.length; i++) {
-        const paa = data.peopleAlsoAsk[i];
-        const paaMetadata = {
-          type: 'peopleAlsoAsk',
-          query: data.searchParameters.q,
-          iso_date: isoDate,
-          cluster,
-          serp_id: serpId,
-          serp_features: serpFeatures
-        };
-        let text_blob = textualizeSerpFeatures('peopleAlsoAsk', data, paa, paaMetadata, undefined, i);
-        text_blob = decodeHTMLEntities(text_blob);
-        const entryId = `${slug}_${isoDate}_peopleAlsoAsk_${i + 1}`;
-        const entry = {
-          id: entryId,
-          text_blob,
-          metadata: {
-            type: 'peopleAlsoAsk',
-            query: data.searchParameters.q,
-            iso_date: isoDate,
-            cluster,
-            serp_id: serpId,
-            serp_features: serpFeatures
-          }
-        };
-        entries.push(entry);
-      }
-    }
-
-    // Process relatedSearches
-    if (data.relatedSearches) {
-      for (let i = 0; i < data.relatedSearches.length; i++) {
-        const rs = data.relatedSearches[i];
-        const rsMetadata = {
-          type: 'relatedSearch',
-          query: data.searchParameters.q,
-          iso_date: isoDate,
-          cluster,
-          serp_id: serpId,
-          serp_features: serpFeatures
-        };
-        let text_blob = textualizeSerpFeatures('relatedSearches', data, rs, rsMetadata, undefined, i);
-        text_blob = decodeHTMLEntities(text_blob);
-        const entryId = `${slug}_${isoDate}_relatedSearch_${i + 1}`;
-        const entry = {
-          id: entryId,
-          text_blob,
-          metadata: {
-            type: 'relatedSearch',
-            query: data.searchParameters.q,
-            iso_date: isoDate,
-            cluster,
-            serp_id: serpId,
-            serp_features: serpFeatures
-          }
-        };
-        entries.push(entry);
-      }
-    }
-
-    // Process aiOverview
-    if (data.aiOverview) {
-      const aiMetadata = {
-        type: 'aiOverview',
-        query: data.searchParameters.q,
-        iso_date: isoDate,
-        cluster,
-        serp_id: serpId,
-        serp_features: serpFeatures
-      };
-      let text_blob = textualizeSerpFeatures('aiOverview', data, data.aiOverview, aiMetadata);
-      text_blob = decodeHTMLEntities(text_blob);
-      const entryId = `${slug}_${isoDate}_aiOverview`;
-      const entry = {
-        id: entryId,
-        text_blob,
-        metadata: {
-          type: 'aiOverview',
-          query: data.searchParameters.q,
-          iso_date: isoDate,
-          cluster,
-          serp_id: serpId,
-          serp_features: serpFeatures
-        }
-      };
-      entries.push(entry);
-    }
-
-    // Process localResults (if present)
-    if (data.localResults) {
-      for (const lr of data.localResults) {
-        const lrMetadata = {
-          type: 'localResult',
-          query: data.searchParameters.q,
-          position: lr.position,
-          iso_date: isoDate,
-          cluster,
-          serp_id: serpId,
-          serp_features: serpFeatures
-        };
-        let text_blob = textualizeSerpFeatures('localResults', data, lr, lrMetadata);
-        text_blob = decodeHTMLEntities(text_blob);
-        const entryId = `${slug}_${isoDate}_localResult_${lr.position}`;
-        const entry = {
-          id: entryId,
-          text_blob,
-          metadata: {
-            type: 'localResult',
-            query: data.searchParameters.q,
-            position: lr.position,
-            iso_date: isoDate,
-            cluster,
-            serp_id: serpId,
-            serp_features: serpFeatures
-          }
-        };
-        entries.push(entry);
-      }
-    }
-
-    // Process videoResults (if present)
-    if (data.videoResults) {
-      for (let i = 0; i < data.videoResults.length; i++) {
-        const vr = data.videoResults[i];
-        const vrMetadata = {
-          type: 'videoResult',
-          query: data.searchParameters.q,
-          iso_date: isoDate,
-          cluster,
-          serp_id: serpId,
-          serp_features: serpFeatures
-        };
-        let text_blob = textualizeSerpFeatures('videoResults', data, vr, vrMetadata, undefined, i);
-        text_blob = decodeHTMLEntities(text_blob);
-        const entryId = `${slug}_${isoDate}_videoResult_${i + 1}`;
-        const entry = {
-          id: entryId,
-          text_blob,
-          metadata: {
-            type: 'videoResult',
-            query: data.searchParameters.q,
-            iso_date: isoDate,
-            cluster,
-            serp_id: serpId,
-            serp_features: serpFeatures
-          }
-        };
-        entries.push(entry);
-      }
-    }
-
-    // Process knowledgeGraph (if present)
-    if (data.knowledgeGraph) {
-      const kgMetadata = {
-        type: 'knowledgeGraph',
-        query: data.searchParameters.q,
-        iso_date: isoDate,
-        cluster,
-        serp_id: serpId,
-        serp_features: serpFeatures
-      };
-      let text_blob = textualizeSerpFeatures('knowledgeGraph', data, data.knowledgeGraph, kgMetadata);
-      text_blob = decodeHTMLEntities(text_blob);
-      const entryId = `${slug}_${isoDate}_knowledgeGraph`;
-      const entry = {
-        id: entryId,
-        text_blob,
-        metadata: {
-          type: 'knowledgeGraph',
-          query: data.searchParameters.q,
-          iso_date: isoDate,
-          cluster,
-          serp_id: serpId,
-          serp_features: serpFeatures
-        }
-      };
-      entries.push(entry);
-    }
+    const processed = await buildSerpEntries(data);
+    entries.push(...processed);
   }
 
   return entries;
@@ -282,7 +32,12 @@ async function preprocess() {
 async function main() {
   const entries = await preprocess();
   console.log(`Total entries: ${entries.length}`);
-  await writeFile(join(process.cwd(), 'assets', 'processed.json'), JSON.stringify(entries, null, 2));
+  // Filter unique entries by id
+  const uniqueEntries = entries.filter((entry, index, self) => 
+    self.findIndex(e => e.id === entry.id) === index
+  );
+  console.log(`Unique entries: ${uniqueEntries.length}`);
+  await writeFile(join(process.cwd(), 'assets', 'processed.json'), JSON.stringify(uniqueEntries, null, 2));
 }
 
 // For testing, run and log
