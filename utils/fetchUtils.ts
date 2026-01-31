@@ -1,4 +1,4 @@
-import type { PageHeaders } from '../types.ts';
+import type { PageHeaders } from '../src/types';
 
 export async function fetchHeadings(url: string): Promise<PageHeaders> {
   try {

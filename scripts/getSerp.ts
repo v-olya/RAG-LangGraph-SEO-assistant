@@ -1,7 +1,7 @@
 import { readFile, writeFile, readdir } from 'fs/promises';
 import { join } from 'path';
 import { normalizeSerperResponse } from '../utils/normalizeResponse';
-import type { SerpData } from '../types';
+import type { SerpData } from '../src/types';
 
 async function callSerper(query: string, apiKey: string) {
   const endpoint = 'https://google.serper.dev/search';

@@ -1,4 +1,4 @@
-import type { SerpFeature, SerpData, OrganicResult, AnswerBox, PeopleAlsoAsk, RelatedSearch, AiOverview, LocalResult, VideoResult, KnowledgeGraph, SerpMetadata, PageHeaders } from '../types.js';
+import type { SerpFeature, SerpData, OrganicResult, AnswerBox, PeopleAlsoAsk, RelatedSearch, AiOverview, LocalResult, VideoResult, KnowledgeGraph, SerpMetadata, PageHeaders } from '../src/types';
 
 export function textualizeSerpFeatures(
   feature: SerpFeature,
