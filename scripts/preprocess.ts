@@ -4,6 +4,7 @@ import { slugify, decodeHTMLEntities } from '../utils/stringUtils';
 import { extractCategories, extractDomain } from '../utils/urlUtils';
 import { textualizeSerpFeatures } from '../utils/textUtils';
 import { fetchHeadings } from '../utils/fetchUtils';
+import { detectFeatures } from '../utils/normalizeResponse';
 
 async function preprocess() {
   console.log('preprocess start');
@@ -30,18 +31,13 @@ async function preprocess() {
     const serpId = `${slug}_${isoDate}`;
     
     // Detect SERP features present
-    const serpFeatures = [];
-    if (data.organic && data.organic.length > 0) serpFeatures.push('organic');
-    if (data.answerBox) serpFeatures.push('answerBox');
-    if (data.peopleAlsoAsk && data.peopleAlsoAsk.length > 0) serpFeatures.push('peopleAlsoAsk');
-    if (data.relatedSearches && data.relatedSearches.length > 0) serpFeatures.push('relatedSearches');
-    if (data.aiOverview) serpFeatures.push('aiOverview');
-    if (data.localResults && data.localResults.length > 0) serpFeatures.push('localResults');
-    if (data.videoResults && data.videoResults.length > 0) serpFeatures.push('videoResults');
-    if (data.knowledgeGraph) serpFeatures.push('knowledgeGraph');
+    const serpFeatures = detectFeatures(data);
 
     // Process organic results
     for (const organic of data.organic) {
+      // Skip organic results without links
+      if (!organic.link) continue;
+
       const categories = extractCategories(organic.link);
       const domain = extractDomain(organic.link);
       const headers = await fetchHeadings(organic.link);
