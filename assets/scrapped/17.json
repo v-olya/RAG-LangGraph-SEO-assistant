@@ -9,17 +9,20 @@
     {
       "title": "Italian Pizza Styles Explained",
       "link": "https://italianfoodlab.com/pizza-styles",
-      "snippet": "From Roman to Sicilian, learn about the different styles of Italian pizza."
+      "snippet": "From Roman to Sicilian, learn about the different styles of Italian pizza.",
+      "position": 1
     },
     {
       "title": "How to Make Italian Pizza at Home",
       "link": "https://homemadepizza.com/italian-guide",
-      "snippet": "Tips and tricks for baking Italian pizza in your own kitchen."
+      "snippet": "Tips and tricks for baking Italian pizza in your own kitchen.",
+      "position": 2
     },
     {
       "title": "Best Italian Pizza Restaurants in 2024",
       "link": "https://foodtravel.com/best-italian-pizza",
-      "snippet": "Our editors review the top Italian pizza spots for this year."
+      "snippet": "Our editors review the top Italian pizza spots for this year.",
+      "position": 3
     }
   ]
 }

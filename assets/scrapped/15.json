@@ -9,17 +9,20 @@
     {
       "title": "What Makes Neapolitan Pizza Unique?",
       "link": "https://pizzatheory.io/neapolitan-unique",
-      "snippet": "Discover the history, ingredients, and techniques behind true Neapolitan pizza."
+      "snippet": "Discover the history, ingredients, and techniques behind true Neapolitan pizza.",
+      "position": 1
     },
     {
       "title": "Best Neapolitan Pizza Spots in 2024",
       "link": "https://foodtravel.com/best-neapolitan-pizza",
-      "snippet": "Our picks for the top Neapolitan pizza restaurants around the world."
+      "snippet": "Our picks for the top Neapolitan pizza restaurants around the world.",
+      "position": 2
     },
     {
       "title": "Neapolitan Pizza Dough: Tips & Tricks",
       "link": "https://doughmasters.com/neapolitan-tips",
-      "snippet": "How to master the perfect Neapolitan dough at home."
+      "snippet": "How to master the perfect Neapolitan dough at home.",
+      "position": 3
     }
   ]
 }

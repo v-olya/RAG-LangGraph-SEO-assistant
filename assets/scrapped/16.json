@@ -9,17 +9,20 @@
     {
       "title": "Authentic Italian Pizza: The Essentials",
       "link": "https://italianfoodlab.com/authentic-pizza",
-      "snippet": "Learn what makes a pizza truly authentic, from dough to toppings."
+      "snippet": "Learn what makes a pizza truly authentic, from dough to toppings.",
+      "position": 1
     },
     {
       "title": "Traditional Pizza Techniques",
       "link": "https://pizzatheory.io/traditional-techniques",
-      "snippet": "Explore classic methods for making pizza like in Naples."
+      "snippet": "Explore classic methods for making pizza like in Naples.",
+      "position": 2
     },
     {
       "title": "Where to Eat Authentic Pizza in 2024",
       "link": "https://foodtravel.com/authentic-pizza-2024",
-      "snippet": "Our guide to the best places for authentic pizza this year."
+      "snippet": "Our guide to the best places for authentic pizza this year.",
+      "position": 3
     }
   ]
 }

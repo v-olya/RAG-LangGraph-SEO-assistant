@@ -9,17 +9,20 @@
     {
       "title": "Classic Margherita Pizza Recipe",
       "link": "https://italianfoodlab.com/margherita-recipe",
-      "snippet": "Step-by-step guide to making authentic Margherita pizza at home."
+      "snippet": "Step-by-step guide to making authentic Margherita pizza at home.",
+      "position": 1
     },
     {
       "title": "Easy Homemade Pizza Dough",
       "link": "https://doughmasters.com/easy-pizza-dough",
-      "snippet": "Simple recipe for soft, chewy pizza dough with just 5 ingredients."
+      "snippet": "Simple recipe for soft, chewy pizza dough with just 5 ingredients.",
+      "position": 2
     },
     {
       "title": "Creative Pizza Toppings for 2024",
       "link": "https://pizzacreators.com/toppings-2024",
-      "snippet": "Explore new topping ideas to elevate your homemade pizza."
+      "snippet": "Explore new topping ideas to elevate your homemade pizza.",
+      "position": 3
     }
   ]
 }
