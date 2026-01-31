@@ -99,8 +99,8 @@ export interface SerpMetadata {
   type: string;
   serp_id: string;
   position?: number;
-  domain?: string;
-  categories?: string[];
+  domain: string;
+  categories: string[];
 }
 
 export interface PageHeaders {
@@ -121,4 +121,10 @@ export interface SerperResponse {
   knowledgeGraph?: KnowledgeGraph;
   // Allow any other properties
   [key: string]: unknown;
+}
+
+export interface ProcessedEntry {
+  id: string;
+  text_blob: string;
+  metadata: SerpMetadata;
 }
