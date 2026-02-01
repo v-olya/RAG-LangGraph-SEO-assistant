@@ -47,7 +47,7 @@ async function run() {
       try {
         const serperResp = await callSerper(q, apiKey) as SerpData;
 
-        const normalized = normalizeSerperResponse(serperResp as unknown as Record<string, unknown>, q, cluster);
+        const normalized = normalizeSerperResponse(serperResp as unknown as Record<string, unknown>, cluster, q);
 
         if (normalized == null) {
           console.log(`- Skipping save for query "${q}" (inconsistent organic positions)`);
@@ -60,7 +60,6 @@ async function run() {
         console.log(`✓ Saved ${fileName} for query: "${q}"`);
         nextIndex++;
 
-        // gentle delay to avoid rate limits
         await sleep(600);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
@@ -72,7 +71,9 @@ async function run() {
   console.log('Done.');
 }
 
-// For testing, run and log
-run().catch((err: unknown) => { console.error(err); process.exit(1); });
+run().catch((err: unknown) => { 
+  console.error(err); 
+  process.exit(1); 
+});
 
 export { run };
