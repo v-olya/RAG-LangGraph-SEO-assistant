@@ -211,7 +211,8 @@ export default function Chat() {
             className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
             aria-describedby="chat-hint"
           />
-          <SendButton disabled={isLoading || !input.trim()} />
+        <ReloadButton onClick={handleReload} disabled={isLoading} />
+        <SendButton disabled={isLoading || !input.trim()} />
         </div>
         <p id="chat-hint" className="sr-only">
           Press Enter to send your message
