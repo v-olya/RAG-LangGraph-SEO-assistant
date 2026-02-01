@@ -24,6 +24,14 @@ export default [
         fetch: 'readonly',
         URL: 'readonly',
         AbortSignal: 'readonly',
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        Event: 'readonly',
+        EventTarget: 'readonly',
       },
     },
     plugins: {
