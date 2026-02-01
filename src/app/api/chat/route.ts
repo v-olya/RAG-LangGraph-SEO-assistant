@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runSEOQuery, type SEOGraphResponse } from "../../agenticWorkflow";
-
-export interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
+import { runSEOQuery } from "../../agenticWorkflow";
+import type { SEOGraphResponse, ConversationMessage } from "@/types";
 
 export interface ChatRequest {
   query: string;
-  history?: ChatMessage[];
+  history?: ConversationMessage[];
 }
 
 export interface ChatResponse {
