@@ -93,7 +93,7 @@ Available tools:
 - analyze_content_types: Analyze what TYPES of content rank (blogs, product pages, guides, etc.)
 
 Choose the most appropriate tool(s) based on the user's question.
-If user asks about content "type", "format", or "what kind of content" - use analyze_content_types.
+If user asks "what content", "what type of content", or "what kind of content" - use analyze_content_types.
 
 ${INTENT_DETECTION}
 `;
