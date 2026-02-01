@@ -52,6 +52,28 @@ cp .env.example .env.local
 - `npm run start-cron` — Scheduled tasks for data updates and maintenance.
 - `npm run check-db` — Database health checks and maintenance.
 
+## Vector store metadata
+
+When documents are seeded into the vector store, each entry includes a `metadata` object matching the `SerpMetadata` interface (see `src/types.ts`). This metadata is used for filtering, provenance, and cluster grouping:
+
+- **iso_date**: ISO timestamp when the SERP was processed
+- **serp_features**: array of SERP features present (e.g., `answerBox`, `videoResults`)
+- **cluster**: cluster or query group name (should match entries in `assets/clusters.json`)
+- **query**: the search query string
+- **type**: type of SERP entry (e.g., `organic`, `news`, etc.)
+- **serp_id**: unique identifier for the SERP
+- **position**: SERP rank (1-based, optional)
+- **domain**: domain of the result
+- **categories**: array of category labels
+
+Embeddings are stored in the vector index; metadata is used for retrieval and filtering. Keep the `cluster` value consistent with entries in `assets/clusters.json` to enable accurate cluster comparisons.
+
+**NB! Prepopulate clusters with queries for periodic SERP scraping**
+
+The project expects `assets/clusters.json` to contain cluster definitions (== query lists) used by scheduled scraper to fetch SERP data. 
+
+Each cluster's queries are then consumed by `scripts/getSerp.ts` and the cron runner.
+
 ## Agentic Processing
 
 Chat component (`src/components/Chat.tsx`) and API route (`src/app/api/chat/route.ts`) allows users to ask questions and get AI-powered responses based on the indexed SEO data.
