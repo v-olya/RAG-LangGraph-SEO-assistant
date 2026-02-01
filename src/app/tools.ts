@@ -3,7 +3,8 @@ import { DynamicStructuredTool } from "@langchain/core/tools";
 import { Document } from "@langchain/core/documents";
 import { getVectorStore, getSupabaseClient } from "@/vectorStore";
 import { INTENT_DETECTION } from "../constants";
-import { model } from "./models";
+import { model, baseModel } from "./models";
+import { withGuardrails } from "./guardrails";
 import { 
   extractClusterHint, 
   detectClusterFromQuery, 
@@ -400,4 +401,4 @@ export const retrievalTools = [
   analyzeContentTypesTool,
 ];
 
-export const modelWithTools = model.bindTools(retrievalTools);
+export const modelWithTools = withGuardrails(baseModel.bindTools(retrievalTools));
