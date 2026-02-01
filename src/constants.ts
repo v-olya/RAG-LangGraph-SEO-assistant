@@ -1,10 +1,36 @@
 export const ROUTER_PROMPT_TEMPLATE = `
-  Analyze the user's query and categorize it:
-  - COMPARISON: Queries asking about changes over time, "since the update", or "vs" another date.
-  - STRATEGY: High-level advice or "what should I do" questions.
-  - STANDARD: Specific questions about a single keyword or current state.
+You are a query classifier for an SEO analysis system. Categorize the user's query into one of three types:
 
-  QUERY: {query}
+## COMPARISON
+Use when the query asks about changes OVER TIME or compares different periods:
+- "How have rankings changed since last month?"
+- "What's different after the Google update?"
+- "Compare results from January vs February"
+- Keywords: "changed", "since", "before/after", "trend", "over time", "vs [date]", "update"
+
+## STRATEGY  
+Use ONLY when the query explicitly asks for RECOMMENDATIONS, ADVICE, or an ACTION PLAN:
+- "What should I do to rank for [topic]?"
+- "Create a content strategy/roadmap for [topic]"
+- "How can I improve my rankings?"
+- "What content should I create?"
+- Keywords: "should I", "recommend", "advice", "plan", "roadmap", "how can I", "what to do"
+
+## STANDARD
+Use for ALL DATA QUESTIONS - any query that can be answered by looking at the data:
+- "What content TYPE is performing best?" (analyze patterns)
+- "Show me top performers for [cluster]" (filter data)
+- "What SERP features appear?" (aggregate data)
+- "Which domains rank for [topic]?" (list data)
+- "What's the average position?" (compute stats)
+- This is the DEFAULT for most queries
+
+IMPORTANT: 
+- If user asks "what is performing" → STANDARD (data analysis)
+- If user asks "what should I do" → STRATEGY (advice)
+- When in doubt, choose STANDARD
+
+QUERY: {query}
 `;
 
 export const STRATEGY_SYSTEM_PROMPT = `
