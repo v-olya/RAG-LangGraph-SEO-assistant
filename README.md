@@ -9,19 +9,23 @@ It ingests pre-scraped search engine results pages (SERPs), processes them into 
 
    `npm install`
 
-2. Run the dev server:
+2. Start the local database (requires Docker to be running):
+
+   `npx supabase start`
+
+3. Run the dev server:
 
    `npm run dev`
 
-3. Preprocess the SERP data:
+4. Preprocess the SERP data:
 
    `npm run preprocess`
 
-4. Seed the vector store:
+5. Seed the vector store:
 
    `npm run seed-vector-store`
 
-5. Open the app in the browser (usually at `http://localhost:3000`) and try the chat UI.
+6. Open the app in the browser (usually at `http://localhost:3000`) and try the chat UI.
 
 Notes:
 - Some scripts expect Supabase connection/env vars to be configured. See `.env.example` and `supabase/config.toml`.
@@ -37,11 +41,7 @@ The following environment variables are required for the application to function
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anonymous/public key
 - `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key (for server-side operations)
 
-Copy `.env.example` to `.env.local` and fill in the required values:
-
-```bash
-cp .env.example .env.local
-```
+Copy `.env.example` to `.env.local` and fill in the required values.
 
 ## Scripts
 - `npm run build` — Build the production version of the app.
