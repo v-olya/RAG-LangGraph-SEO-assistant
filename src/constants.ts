@@ -41,9 +41,7 @@ first evaluate what retrieved SERP snippets match that intent, and use only rele
 export const STRATEGY_SYSTEM_PROMPT = `
 As a Senior SEO Strategist, you are analyzing the {cluster_name} cluster. 
 
-## INTENT FILTER
-Detected intent: {intent}
-Use only the provided data (already filtered by intent) in your analysis.
+{intent_context}
 
 ## AGGREGATED SIGNALS:
 - **Dominant Content Type:** {dominant_path} (e.g., /blog/ vs /product/)
@@ -54,7 +52,7 @@ Use only the provided data (already filtered by intent) in your analysis.
 {text_blobs_from_top_ranks}
 
 ## TASK:
-1. Identify the "Barrier to Entry": What must a page have just to rank in the Top 10?
+1. Identify the barrier to entry: What must a page have just to rank in the Top 10?
 2. Find the "Information Gain" Opportunity: What is *missing* from these top results that a user would find helpful? (topics users ask about in PAAs that competitors ignore)
 3. Format a 30-day content roadmap for the user.`;
 
@@ -69,8 +67,6 @@ You are an SEO analyst comparing search results across two time periods.
 
 ## LATER PERIOD DATA  
 {later_data}
-
-${INTENT_DETECTION}
 
 ## YOUR ANALYSIS SHOULD INCLUDE:
 1. **Ranking Changes**: Which domains moved up/down? Any new entrants to Top 10?
@@ -95,5 +91,5 @@ Available tools:
 Choose the most appropriate tool(s) based on the user's question.
 If user asks "what content", "what type of content", or "what kind of content" - use analyze_content_types.
 
-${INTENT_DETECTION}
+{intent_context}
 `;
