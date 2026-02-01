@@ -1,3 +1,19 @@
+
+export function sanitizeText(input: string, toLowerCase = false): string {
+  if (!input) return '';
+  // Remove HTML tags
+  let text = input.replace(/<[^>]*>/g, ' ');
+  // Remove control/non-printable characters
+  text = Array.from(text).filter(c => {
+    const code = c.charCodeAt(0);
+    return (code >= 32 && code !== 127) || c === '\n' || c === '\r' || c === '\t';
+  }).join('');
+  // Normalize whitespace
+  text = text.replace(/\s+/g, ' ').trim();
+  if (toLowerCase) text = text.toLowerCase();
+  return text;
+}
+
 export function slugify(input: string | undefined | null): string {
   if (!input) return '';
   return input

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, FormEvent, KeyboardEvent } from "react";
+import { sanitizeText } from "../../utils/stringUtils";
 import { ReloadButton } from "./ui/ReloadButton";
 import { SendButton } from "./ui/SendButton";
 import { LoadingIndicator } from "./ui/LoadingIndicator";
@@ -45,11 +46,12 @@ export default function Chat() {
       
       const trimmedInput = input.trim();
       if (!trimmedInput || isLoading) return;
+      const sanitizedInput = sanitizeText(trimmedInput);
 
       const userMessage: Message = {
         id: crypto.randomUUID(),
         role: "user",
-        content: trimmedInput,
+        content: sanitizedInput,
       };
 
       setMessages((prev) => [...prev, userMessage]);
@@ -120,7 +122,7 @@ export default function Chat() {
     <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg overflow-hidden">
       <header className="bg-emerald-500 text-white p-4 flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">SEO Analysis Chat</h1>
+          <h1 className="text-lg font-semibold">SEO Assistant Chat</h1>
           <p className="mt-1 text-sm text-emerald-100">
             Ask about keywords, SERP, rankings, or strategy
           </p>
@@ -130,7 +132,7 @@ export default function Chat() {
 
       {/* Messages */}
       <div 
-        className="h-[500px] p-4 overflow-y-auto space-y-4"
+        className="min-h-[500px] p-4 overflow-y-auto space-y-4"
         role="log"
         aria-live="polite"
         aria-label="Chat messages"
@@ -147,9 +149,7 @@ export default function Chat() {
           messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
-              }`}
+              className={message.role === "user" ? "flex justify-end" : ""}
             >
               <div
                 className={`rounded-lg px-4 py-2 break-words ${
