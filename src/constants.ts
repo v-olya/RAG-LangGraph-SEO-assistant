@@ -33,8 +33,17 @@ IMPORTANT:
 QUERY: {query}
 `;
 
+export const INTENT_DETECTION = `
+If the user’s question specifies a query intent (e.g., transactional, informational, navigational), 
+first evaluate what retrieved SERP snippets match that intent, and use only relevant ones when generating the answer.
+`;
+
 export const STRATEGY_SYSTEM_PROMPT = `
 As a Senior SEO Strategist, you are analyzing the {cluster_name} cluster. 
+
+## INTENT FILTER
+Detected intent: {intent}
+Use only the provided data (already filtered by intent) in your analysis.
 
 ## AGGREGATED SIGNALS:
 - **Dominant Content Type:** {dominant_path} (e.g., /blog/ vs /product/)
@@ -61,6 +70,8 @@ You are an SEO analyst comparing search results across two time periods.
 ## LATER PERIOD DATA  
 {later_data}
 
+${INTENT_DETECTION}
+
 ## YOUR ANALYSIS SHOULD INCLUDE:
 1. **Ranking Changes**: Which domains moved up/down? Any new entrants to Top 10?
 2. **Content Shifts**: How has the type of content ranking changed? (more guides vs product pages, longer vs shorter content)
@@ -82,4 +93,7 @@ Available tools:
 - analyze_content_types: Analyze what TYPES of content rank (blogs, product pages, guides, etc.)
 
 Choose the most appropriate tool(s) based on the user's question.
-If user asks about content "type", "format", or "what kind of content" - use analyze_content_types.`;
+If user asks about content "type", "format", or "what kind of content" - use analyze_content_types.
+
+${INTENT_DETECTION}
+`;

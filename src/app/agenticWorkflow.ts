@@ -13,6 +13,7 @@ import {
   STRATEGY_SYSTEM_PROMPT,
   COMPARISON_SYSTEM_PROMPT,
   STANDARD_AGENT_PROMPT,
+  INTENT_DETECTION,
 } from "../constants";
 
 // ============================================================================
@@ -21,6 +22,14 @@ import {
 
 const QueryIntent = z.enum(["STANDARD", "COMPARISON", "STRATEGY"]);
 type QueryIntentType = z.infer<typeof QueryIntent>;
+
+const SearchIntent = z.enum([
+  "informational",
+  "navigational",
+  "transactional",
+  "unknown",
+]);
+type SearchIntentType = z.infer<typeof SearchIntent>;
 
 interface TimeRange {
   start: string;
@@ -257,9 +266,10 @@ const analyzeContentTypesTool = new DynamicStructuredTool({
   schema: z.object({
     cluster: z.string().optional().describe("Optional: Filter by cluster name"),
     query: z.string().optional().describe("Optional: Filter by search query or topic"),
+    intent: z.string().optional().describe("Optional: Search intent (informational, navigational, transactional)"),
     positionThreshold: z.number().optional().default(10).describe("Only analyze content ranking at or above this position"),
   }),
-  func: async ({ cluster, query, positionThreshold }) => {
+  func: async ({ cluster, query, intent, positionThreshold }) => {
     const client = getSupabaseClient();
     let dbQuery = client
       .from("seo_documents")
@@ -285,7 +295,32 @@ const analyzeContentTypesTool = new DynamicStructuredTool({
       });
     }
 
-    // Optimized LLM prompt for faster analysis
+    const {
+      resolvedIntent,
+      filteredItems: filteredData,
+      intentFilterApplied,
+      filteredOutCount,
+    } = await applyIntentFilterToItems({
+      query,
+      providedIntent: intent,
+      items: data,
+      toIntentItem: (row) => ({
+        domain: row.metadata.domain,
+        position: row.metadata.position,
+        snippet: row.content?.substring(0, 150) || "",
+      }),
+    });
+
+    if (!filteredData.length) {
+      return JSON.stringify({
+        error: "No results match the detected intent",
+        intent: resolvedIntent.intent,
+        intent_filter_applied: intentFilterApplied,
+        filtered_out: filteredOutCount,
+        filters_used: { cluster, query, intent, positionThreshold },
+      });
+    }
+
     const contentAnalysisPrompt = `Analyze these search results and categorize each by content type. Use these categories:
 - recipe (cooking/food content)
 - video_tutorial (video guides)
@@ -299,10 +334,14 @@ const analyzeContentTypesTool = new DynamicStructuredTool({
 - comparison_article (vs articles)
 - reference_guide (encyclopedic/wiki)
 
+${INTENT_DETECTION}
+Detected intent: ${resolvedIntent.intent}
+If intent is NOT "unknown", only include results that match the detected intent.
+
 Return JSON: {"content_type_analysis": [{"content_type": "recipe", "domain": "example.com", "position": 1, "confidence": "high", "reasoning": "brief explanation"}]}
 
 Results:
-${data.map((row, i) => `
+${filteredData.map((row, i) => `
 ${i + 1}. ${row.metadata.domain} (pos ${row.metadata.position}): ${row.content?.substring(0, 150)}...`).join('\n')}`;
 
     const analysisResponse = await model.invoke([
@@ -368,6 +407,9 @@ ${i + 1}. ${row.metadata.domain} (pos ${row.metadata.position}): ${row.content?.
       summary: `Analyzed ${totalResults} top results`,
       content_type_breakdown: analysis,
       insight: analysis[0] ? `"${analysis[0].content_type}" leads with ${analysis[0].percentage}%` : "Mixed content types",
+      intent: resolvedIntent.intent,
+      intent_filter_applied: intentFilterApplied,
+      filtered_out: filteredOutCount,
     });
   },
 });
@@ -484,7 +526,13 @@ async function toolExecutorNode(state: SEOState): Promise<Partial<SEOState>> {
           result = await getClusterDataTool.invoke(toolCall.args as { cluster: string; limit?: number });
           break;
         case "analyze_content_types":
-          result = await analyzeContentTypesTool.invoke(toolCall.args as { cluster?: string; query?: string; positionThreshold?: number });
+          {
+            const analyzeArgs = toolCall.args as { cluster?: string; query?: string; intent?: string; positionThreshold?: number };
+            result = await analyzeContentTypesTool.invoke({
+              ...analyzeArgs,
+              query: analyzeArgs.query ?? state.query,
+            });
+          }
           break;
         default:
           result = JSON.stringify({ error: `Unknown tool: ${toolName}` });
@@ -572,19 +620,34 @@ async function strategyNode(state: SEOState): Promise<Partial<SEOState>> {
 
   console.log(`[Strategy] Retrieved ${clusterDocs.length} documents for cluster`);
 
+  const {
+    resolvedIntent,
+    filteredItems: filteredClusterDocs,
+  } = await applyIntentFilterToItems({
+    query: state.query,
+    items: clusterDocs,
+    logLabel: "Strategy",
+    toIntentItem: (doc) => ({
+      domain: doc.metadata.domain,
+      position: doc.metadata.position,
+      snippet: doc.pageContent?.substring(0, 150) || "",
+    }),
+  });
+
   // Step 3: Compute cluster statistics
-  const stats = computeClusterStats(clusterDocs);
+  const stats = computeClusterStats(filteredClusterDocs);
 
   // Step 4: Format aggregated signals for the prompt
   const dominantPath = getTopItems(stats.categoryPaths, 3).join(", ") || "/";
   const topSerpFeatures = formatSerpFeatureStats(stats.serpFeatureFrequency);
-  const topHeaders = extractCommonHeaders(clusterDocs.slice(0, 10));
-  const competitiveLandscape = formatCompetitiveLandscape(clusterDocs.slice(0, 5));
+  const topHeaders = extractCommonHeaders(filteredClusterDocs.slice(0, 10));
+  const competitiveLandscape = formatCompetitiveLandscape(filteredClusterDocs.slice(0, 5));
 
   // Step 5: Generate strategy response with full context
   const strategyPrompt = PromptTemplate.fromTemplate(STRATEGY_SYSTEM_PROMPT);
   const finalPrompt = await strategyPrompt.format({
     cluster_name: clusterName,
+    intent: resolvedIntent.intent,
     dominant_path: dominantPath,
     top_serp_features: topSerpFeatures,
     top_headers: topHeaders,
@@ -774,6 +837,170 @@ export async function runSEOQuery(
 // ============================================================================
 // 7. Helper Functions
 // ============================================================================
+
+async function applyIntentFilterToItems<T>({
+  query,
+  providedIntent,
+  items,
+  toIntentItem,
+  logLabel,
+}: {
+  query?: string;
+  providedIntent?: string;
+  items: T[];
+  toIntentItem: (item: T) => { domain?: string; position?: number; snippet?: string, item?: typeof item };
+  logLabel?: string;
+}): Promise<{
+  resolvedIntent: { intent: SearchIntentType; confidence: "low" | "medium" | "high" };
+  filteredItems: T[];
+  intentFilterApplied: boolean;
+  filteredOutCount: number;
+}> {
+  const resolvedIntent = await resolveSearchIntent(query, providedIntent);
+  const intentFilter = await filterItemsByIntent({
+    query,
+    intent: resolvedIntent.intent,
+    items: items.map((item, index) => ({
+      index,
+      ...toIntentItem(item),
+    })),
+  });
+
+  const filteredItems = intentFilter.keepIndices
+    ? items.filter((_, idx) => intentFilter.keepIndices?.has(idx))
+    : items;
+
+  const filteredOutCount = items.length - filteredItems.length;
+
+  if (logLabel && intentFilter.keepIndices) {
+    console.log(
+      `[${logLabel}] Intent filter (${resolvedIntent.intent}) removed ${filteredOutCount} items`
+    );
+  }
+
+  return {
+    resolvedIntent,
+    filteredItems,
+    intentFilterApplied: intentFilter.keepIndices !== null,
+    filteredOutCount,
+  };
+}
+
+function normalizeSearchIntent(intent?: string): SearchIntentType | null {
+  if (!intent) return null;
+  const normalized = intent.trim().toLowerCase();
+  if (normalized.startsWith("info")) return "informational";
+  if (normalized.startsWith("nav")) return "navigational";
+  if (normalized.startsWith("trans")) return "transactional";
+  if (normalized.startsWith("comm") || normalized.includes("investig")) return "transactional";
+  if (normalized.startsWith("local")) return "transactional";
+  if (normalized.startsWith("unknown")) return "unknown";
+  return null;
+}
+
+async function resolveSearchIntent(
+  query?: string,
+  providedIntent?: string
+): Promise<{ intent: SearchIntentType; confidence: "low" | "medium" | "high" }> {
+  const normalized = normalizeSearchIntent(providedIntent);
+  if (normalized) {
+    return { intent: normalized, confidence: "high" };
+  }
+
+  if (!query || query.trim().length === 0) {
+    return { intent: "unknown", confidence: "low" };
+  }
+
+  return detectSearchIntent(query);
+}
+
+async function detectSearchIntent(
+  query: string
+): Promise<{ intent: SearchIntentType; confidence: "low" | "medium" | "high" }> {
+  const intentSchema = z.object({
+    intent: SearchIntent,
+    confidence: z.enum(["low", "medium", "high"]),
+    rationale: z.string().optional(),
+  });
+
+  const intentParser = StructuredOutputParser.fromZodSchema(intentSchema);
+
+  const prompt = `Classify the search intent for this query.
+Use one of: informational, navigational, transactional, unknown.
+
+Definitions:
+- informational: user seeks knowledge, explanations, or how-to
+- navigational: user wants a specific site or brand
+- transactional: user wants to buy, order, subscribe, or download
+- unknown: cannot infer intent
+
+Query: "${query}"
+
+${intentParser.getFormatInstructions()}`;
+
+  try {
+    const response = await model.invoke(prompt);
+    const parsed = await intentParser.parse(response.content as string);
+    return { intent: parsed.intent, confidence: parsed.confidence };
+  } catch {
+    return { intent: "unknown", confidence: "low" };
+  }
+}
+
+async function filterItemsByIntent({
+  query,
+  intent,
+  items,
+}: {
+  query?: string;
+  intent: SearchIntentType;
+  items: Array<{ index: number; domain?: string; position?: number; snippet?: string }>;
+}): Promise<{ keepIndices: Set<number> | null }> {
+  if (!query || intent === "unknown" || items.length === 0) {
+    return { keepIndices: null };
+  }
+
+  const filterSchema = z.object({
+    keep: z.array(z.number()).describe("1-based indices to keep"),
+    reason: z.string().optional(),
+  });
+
+  const filterParser = StructuredOutputParser.fromZodSchema(filterSchema);
+
+  const prompt = `${INTENT_DETECTION}
+Detected intent: ${intent}
+Query: "${query}"
+
+Select which items match the intent. Only include items that match.
+If unsure, include the item.
+
+Return JSON: {"keep":[1,2,3]}
+
+Items:
+${items
+  .map((item, i) => {
+    const position = item.position ? ` (pos ${item.position})` : "";
+    const snippet = item.snippet ? `: ${item.snippet}` : "";
+    return `${i + 1}. ${item.domain || "unknown"}${position}${snippet}`;
+  })
+  .join("\n")}
+
+${filterParser.getFormatInstructions()}`;
+
+  try {
+    const response = await model.invoke(prompt);
+    const parsed = await filterParser.parse(response.content as string);
+    const keepIndices = new Set<number>();
+    for (const index of parsed.keep || []) {
+      if (Number.isInteger(index) && index >= 1 && index <= items.length) {
+        keepIndices.add(index - 1);
+      }
+    }
+    return { keepIndices };
+  } catch {
+    return { keepIndices: null };
+  }
+}
 
 // Detect time ranges from the query for comparison analysis
 async function detectTimeRanges(
