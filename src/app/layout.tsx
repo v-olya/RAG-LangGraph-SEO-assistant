@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'SEO RAG App',
-  description: 'Next.js app with Langchain, Supabase, and OpenAI',
+  title: 'RAG SEO Assistant',
+  description: 'Next.js + React app with Langchain/LangGraph, Supabase, and OpenAI',
 }
 
 export default function RootLayout({
