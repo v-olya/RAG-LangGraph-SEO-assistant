@@ -1,7 +1,10 @@
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+import { config } from 'dotenv';
 import { upsertProcessedEntries } from '../src/vectorStore';
 import type { ProcessedEntry } from '../src/types';
+
+config();
 
 const BATCH_SIZE = 100;
 

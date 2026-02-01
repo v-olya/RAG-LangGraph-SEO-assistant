@@ -24,6 +24,7 @@
     "@langchain/openai": "^1.2.3",
     "@supabase/supabase-js": "^2.93.3",
     "autoprefixer": "^10.4.23",
+    "dotenv": "^17.2.3",
     "langchain": "^1.2.15",
     "next": "^16.1.5",
     "node-cron": "^4.1.0",

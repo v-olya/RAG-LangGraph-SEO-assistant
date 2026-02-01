@@ -1,5 +1,8 @@
+import { config } from 'dotenv';
 import { getSupabaseClient } from '../src/vectorStore';
 import { OpenAIEmbeddings } from '@langchain/openai';
+
+config();
 
 async function checkSelect() {
   const client = getSupabaseClient();
@@ -10,10 +13,12 @@ async function checkSelect() {
     console.log('Sample documents:', data);
   }
 
-  // Test vector search
   const embeddings = new OpenAIEmbeddings({ model: 'text-embedding-3-small' });
   const queryEmbedding = await embeddings.embedQuery('best pizza oven');
-  const { data: matchData, error: matchError } = await client.rpc('match_seo_documents', { query_embedding: queryEmbedding, match_count: 3 });
+  const { data: matchData, error: matchError } = await client.rpc('match_seo_documents', { 
+    query_embedding: queryEmbedding, 
+    match_count: 3 
+  });
   if (matchError) {
     console.error('Match Error:', matchError);
   } else {
