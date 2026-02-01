@@ -2,8 +2,8 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase';
 import type { Embeddings } from '@langchain/core/embeddings';
-import type { ProcessedEntry, SerpData } from '../types';
-import { buildSerpEntries } from '../../utils/buildSerpEntries';
+import type { ProcessedEntry, SerpData } from './types';
+import { buildSerpEntries } from '../utils/buildSerpEntries';
 
 const TABLE_NAME = 'seo_documents';
 const MATCH_FUNCTION_NAME = 'match_seo_documents';

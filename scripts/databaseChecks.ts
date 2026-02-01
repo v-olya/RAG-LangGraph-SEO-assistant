@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '../src/lib/vectorStore';
+import { getSupabaseClient } from '../src/vectorStore';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
 async function checkSelect() {

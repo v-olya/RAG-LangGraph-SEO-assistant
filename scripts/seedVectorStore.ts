@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { upsertProcessedEntries } from '../src/lib/vectorStore';
+import { upsertProcessedEntries } from '../src/vectorStore';
 import type { ProcessedEntry } from '../src/types';
 
 const BATCH_SIZE = 100;
