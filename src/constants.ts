@@ -1,36 +1,46 @@
 export const ROUTER_PROMPT_TEMPLATE = `
-You are a query classifier for an SEO analysis system. Categorize the user's query into one of three types:
+You are a query classifier for an SEO analysis system. Help the system decide how to handle the user's CURRENT QUERY.
 
-## COMPARISON
-Use when the query asks about changes OVER TIME or compares different periods:
+## INTENT TYPES
+
+### COMPARISON
+Use when the CURRENT QUERY asks about changes OVER TIME or compares different periods:
 - "How have rankings changed since last month?"
 - "What's different after the Google update?"
 - "Compare results from January vs February"
 - Keywords: "changed", "since", "before/after", "trend", "over time", "vs [date]", "update"
 
-## STRATEGY  
-Use ONLY when the query explicitly asks for RECOMMENDATIONS, ADVICE, or an ACTION PLAN:
+### STRATEGY  
+Use ONLY when the CURRENT QUERY explicitly asks for RECOMMENDATIONS, ADVICE, or an ACTION PLAN, OR is a conversational follow-up to a strategy session:
 - "What should I do to rank for [topic]?"
 - "Create a content strategy/roadmap for [topic]"
 - "How can I improve my rankings?"
 - "What content should I create?"
-- Keywords: "should I", "recommend", "advice", "plan", "roadmap", "how can I", "what to do"
+- Follow-ups: "What about for transactional intent?", "How does this change for [new topic]?", "Give me more advice on this."
+- Keywords: "should I", "recommend", "advice", "plan", "roadmap", "how can I", "what to do", "what about"
 
-## STANDARD
-Use for ALL DATA QUESTIONS - any query that can be answered by looking at the data:
+### STANDARD
+Use for ALL DATA QUESTIONS. This is the DEFAULT for queries asking for patterns, lists, stats, or "what IS happening" rather than "what SHOULD I do".
 - "What content TYPE is performing best?" (analyze patterns)
 - "Show me top performers for [cluster]" (filter data)
 - "What SERP features appear?" (aggregate data)
 - "Which domains rank for [topic]?" (list data)
-- "What's the average position?" (compute stats)
-- This is the DEFAULT for most queries
 
-IMPORTANT: 
-- If user asks "what is performing" → STANDARD (data analysis)
-- If user asks "what should I do" → STRATEGY (advice)
-- When in doubt, choose STANDARD
+## CONTINUITY RULES
+1. **Maintain STRATEGY** if the user is extending a previous strategy discussion (e.g., asking for more advice, applying the strategy to a sub-topic, or clarifying recommendations).
+2. **Switch to STANDARD** if the user asks a specific data-seeking question, even if it's about the same topic (e.g., asking for "best performing content", "top ranks", or "content types"). Data retrieval should always use STANDARD.
+3. **Switch to COMPARISON** if the user asks to compare periods.
 
-QUERY: {query}
+## CONTEXT HANDLING
+Below is the recent conversation history for reference (e.g., to resolve "it", "that cluster", etc.). 
+
+{history_context}
+
+## CURRENT QUERY
+Analyze the intent of this query based on the current text and the continuity rules above:
+"{query}"
+
+{format_instructions}
 `;
 
 export const INTENT_DETECTION = `
