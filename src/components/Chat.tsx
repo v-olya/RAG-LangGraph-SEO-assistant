@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, FormEvent, KeyboardEvent } from "react";
+import { ReloadButton } from "./ui/ReloadButton";
+import { SendButton } from "./ui/SendButton";
+import { LoadingIndicator } from "./ui/LoadingIndicator";
+import { Badge } from "./ui/Badge";
 import ReactMarkdown from "react-markdown";
 import type { ChatResponse } from "@/app/api/chat/route";
 
@@ -19,6 +23,9 @@ interface Message {
 }
 
 export default function Chat() {
+    const handleReload = () => {
+      window.location.reload();
+    };
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -111,12 +118,14 @@ export default function Chat() {
 
   return (
     <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg overflow-hidden">
-      {/* Header */}
-      <header className="bg-emerald-500 text-white p-4 text-center">
-        <h1 className="text-lg font-semibold">SEO Analysis Chat</h1>
-        <p className="text-sm text-emerald-100">
-          Ask about keywords, SERP,  rankings, or strategy
-        </p>
+      <header className="bg-emerald-500 text-white p-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-semibold">SEO Analysis Chat</h1>
+          <p className="mt-1 text-sm text-emerald-100">
+            Ask about keywords, SERP, rankings, or strategy
+          </p>
+        </div>
+        <ReloadButton onClick={handleReload} disabled={isLoading} />
       </header>
 
       {/* Messages */}
@@ -169,14 +178,10 @@ export default function Chat() {
                 {message.metadata && (
                   <div className="mt-2 pt-2 border-t border-gray-200 text-xs text-gray-500 flex gap-2 flex-wrap">
                     {message.metadata.intent && (
-                      <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded capitalize">
-                        {message.metadata.intent.toLowerCase()}
-                      </span>
+                      <Badge label={message.metadata.intent} type="status" />
                     )}
                     {message.metadata.cluster && (
-                      <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
-                        cluster: {message.metadata.cluster}
-                      </span>
+                      <Badge label={message.metadata.cluster} type="cluster" />
                     )}
                   </div>
                 )}
@@ -185,17 +190,7 @@ export default function Chat() {
           ))
         )}
         
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-gray-100 rounded-lg px-4 py-2">
-              <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]" />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]" />
-              </div>
-            </div>
-          </div>
-        )}
+        {isLoading && <LoadingIndicator />}
         
         <div ref={messagesEndRef} />
       </div>
@@ -216,27 +211,7 @@ export default function Chat() {
             className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
             aria-describedby="chat-hint"
           />
-          <button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            className="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-emerald-300 disabled:cursor-not-allowed transition-colors"
-            aria-label="Send message"
-          >
-            <svg
-              className="w-5 h-5 rotate-90"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              />
-            </svg>
-          </button>
+          <SendButton disabled={isLoading || !input.trim()} />
         </div>
         <p id="chat-hint" className="sr-only">
           Press Enter to send your message
