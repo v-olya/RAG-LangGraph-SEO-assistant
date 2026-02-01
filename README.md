@@ -1,6 +1,6 @@
 # Retrieval-Augmented SEO Assistant
 
-The app implements a RAG workflow for SEO data analysis. It ingests pre-scraped search engine results pages (SERPs), processes them into searchable documents, builds a vector index for semantic search, and provides a chat interface to query insights about SEO content, competitor analysis, and search trends.
+The app implements a RAG workflow for SEO data analysis. It ingests pre-scraped search engine results pages (SERPs), processes them into searchable documents, builds a vector index, and provides a chat interface to query insights about SEO content, competitor analysis, and search trends. With each new chat message, the model receives the conversation history until the user reloads the chat.
 
 Built with Next.js (App Router), React, TypeScript, LangChain, Tailwind CSS for styling, Supabase for data persistence, and a custom vector store implementation.
 
@@ -100,6 +100,8 @@ The app features an agentic workflow built with LangGraph that intelligently han
   - STRATEGY queries analyze cluster data to provide competitive insights and 30-day content plans.
 
 This agentic approach ensures context-aware, accurate responses tailored to different types of SEO inquiries.
+
+NB! If you want to explore a new topic that is unrelated to the previous messages, reload the chat first so the model does not carry over earlier context.
 
 ## Query Examples
 
