@@ -13,6 +13,9 @@ export const Badge = ({ label, type, className = "" }: BadgeProps) => {
     case "cluster":
       colorClass = "bg-blue-100 text-blue-700";
       break;
+    case "intent":
+      colorClass = "bg-purple-100 text-purple-700";
+      break;
     default:
       colorClass = "bg-gray-100 text-gray-700";
   }

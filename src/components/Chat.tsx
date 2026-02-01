@@ -20,6 +20,7 @@ interface Message {
   metadata?: {
     intent?: string;
     cluster?: string;
+    searchIntent?: string;
   };
 }
 
@@ -86,6 +87,7 @@ export default function Chat() {
             ? {
                 intent: data.data.intent ?? undefined,
                 cluster: data.data.cluster,
+                searchIntent: data.data.searchIntent ?? undefined,
               }
             : undefined,
         };
@@ -182,6 +184,9 @@ export default function Chat() {
                     )}
                     {message.metadata.cluster && (
                       <Badge label={message.metadata.cluster} type="cluster" />
+                    )}
+                    {message.metadata.searchIntent && (
+                      <Badge label={message.metadata.searchIntent} type="intent" />
                     )}
                   </div>
                 )}

@@ -39,6 +39,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
         cluster: result.cluster,
         documents: result.documents,
         intent: result.intent,
+        searchIntent: result.searchIntent,
         explanation: result.explanation,
       },
     });
