@@ -15,6 +15,7 @@ import {
   STANDARD_AGENT_PROMPT,
   INTENT_DETECTION,
 } from "../constants";
+import type { SerpMetadata } from '../types';
 
 // ============================================================================
 // 1. Define the Graph State
@@ -117,16 +118,42 @@ const searchByQueryTool = new DynamicStructuredTool({
     limit: z.number().optional().default(10).describe("Maximum number of results"),
   }),
   func: async ({ searchQuery, limit }) => {
+    const clusterHint = await extractClusterHint(searchQuery);
+    if (clusterHint) {
+      const client = getSupabaseClient();
+      const { data, error } = await client
+        .from("seo_documents")
+        .select("content, metadata")
+        .eq("metadata->>cluster", clusterHint)
+        .order("metadata->>position", { ascending: true })
+        .limit(limit ?? 10);
+
+      if (!error && data && data.length > 0) {
+        return JSON.stringify(
+          data.map((row) => ({
+            content: row.content,
+            position: row.metadata.position,
+            domain: row.metadata.domain,
+            cluster: row.metadata.cluster,
+            serp_features: row.metadata.serp_features,
+            date: row.metadata.iso_date,
+          }))
+        );
+      }
+    }
+
     const vectorStore = await getVectorStore();
     const docs = await vectorStore.similaritySearch(searchQuery, limit);
-    return JSON.stringify(docs.map(d => ({
-      content: d.pageContent,
-      position: d.metadata.position,
-      domain: d.metadata.domain,
-      cluster: d.metadata.cluster,
-      serp_features: d.metadata.serp_features,
-      date: d.metadata.iso_date,
-    })));
+    return JSON.stringify(
+      docs.map((d) => ({
+        content: d.pageContent,
+        position: d.metadata.position,
+        domain: d.metadata.domain,
+        cluster: d.metadata.cluster,
+        serp_features: d.metadata.serp_features,
+        date: d.metadata.iso_date,
+      }))
+    );
   },
 });
 
@@ -140,28 +167,71 @@ const getTopPerformersTool = new DynamicStructuredTool({
   }),
   func: async ({ cluster, query, limit }) => {
     const client = getSupabaseClient();
-    let dbQuery = client
-      .from("seo_documents")
-      .select("content, metadata")
-      .lte("metadata->>position", 3)
-      .gte("metadata->>position", 1)
-      .order("metadata->>position", { ascending: true })
-      .limit(limit || 10);
+    const resolvedCluster =
+      normalizeClusterLabel(cluster) ||
+      ((query && (await detectClusterFromQuery(query))) || "");
 
-    if (cluster) {
-      dbQuery = dbQuery.ilike("metadata->>cluster", `%${cluster}%`);
+    const buildTopQuery = (filters?: {
+      cluster?: string;
+      query?: string;
+    }) => {
+      let dbQuery = client
+        .from("seo_documents")
+        .select("content, metadata")
+        .lte("metadata->>position", 3)
+        .gte("metadata->>position", 1)
+        .order("metadata->>position", { ascending: true })
+        .limit(limit || 10);
+
+      if (filters?.cluster) {
+        dbQuery = dbQuery.ilike("metadata->>cluster", `%${filters.cluster}%`);
+      }
+      if (filters?.query) {
+        dbQuery = dbQuery.ilike("metadata->>query", `%${filters.query}%`);
+      }
+
+      return dbQuery;
+    };
+
+    const formatResults = (data: { content: string; metadata: SerpMetadata}[] | null | undefined) =>
+      (data || []).map((row) => ({
+        content: row.content,
+        ...row.metadata,
+      }));
+
+    const runQuery = async (filters?: {
+      cluster?: string;
+      query?: string;
+    }) => {
+      const { data, error } = await buildTopQuery(filters);
+      if (error) {
+        throw new Error(error.message);
+      }
+      return formatResults(data);
+    };
+
+    try {
+      let results: Array<Record<string, unknown>> = [];
+      if (resolvedCluster) {
+        results = await runQuery({ cluster: resolvedCluster });
+      }
+
+      const normalizedQuery = query?.trim();
+      if (results.length === 0 && normalizedQuery) {
+        results = await runQuery({ query: normalizedQuery });
+      }
+
+      if (results.length === 0) {
+        const warning = "No top-ranking snippets found.";
+        return JSON.stringify({ warning, results });
+      }
+
+      return JSON.stringify(results);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown database error";
+      return JSON.stringify({ error: message });
     }
-    if (query) {
-      dbQuery = dbQuery.ilike("metadata->>query", `%${query}%`);
-    }
-
-    const { data, error } = await dbQuery;
-    if (error) return JSON.stringify({ error: error.message });
-
-    return JSON.stringify((data || []).map(row => ({
-      content: row.content,
-      ...row.metadata,
-    })));
   },
 });
 
@@ -176,14 +246,20 @@ const getSerpFeaturesTool = new DynamicStructuredTool({
   }),
   func: async ({ cluster, query, feature, limit }) => {
     const client = getSupabaseClient();
+    
+    // Normalize cluster label for consistent matching
+    const resolvedCluster =
+      normalizeClusterLabel(cluster) ||
+      ((query && (await detectClusterFromQuery(query))) || "");
+
     let dbQuery = client
       .from("seo_documents")
       .select("content, metadata")
       .not("metadata->>serp_features", "eq", "[]")
       .limit(limit || 20);
 
-    if (cluster) {
-      dbQuery = dbQuery.ilike("metadata->>cluster", `%${cluster}%`);
+    if (resolvedCluster) {
+      dbQuery = dbQuery.ilike("metadata->>cluster", `%${resolvedCluster}%`);
     }
     if (query) {
       dbQuery = dbQuery.ilike("metadata->>query", `%${query}%`);
@@ -192,13 +268,16 @@ const getSerpFeaturesTool = new DynamicStructuredTool({
     const { data, error } = await dbQuery;
     if (error) return JSON.stringify({ error: error.message });
 
-    let results = (data || []).map(row => ({
-      content: row.content,
-      serp_features: row.metadata.serp_features,
-      query: row.metadata.query,
-      cluster: row.metadata.cluster,
-      position: row.metadata.position,
-    }));
+    let results = (data || []).map(row => {
+      const typedRow = row as { content: string; metadata: { serp_features?: string[]; query?: string; cluster?: string; position?: number } };
+      return {
+        content: typedRow.content,
+        serp_features: typedRow.metadata.serp_features,
+        query: typedRow.metadata.query,
+        cluster: typedRow.metadata.cluster,
+        position: typedRow.metadata.position,
+      };
+    });
 
     // Filter by specific feature if provided
     if (feature) {
@@ -232,10 +311,13 @@ const getClusterDataTool = new DynamicStructuredTool({
   func: async ({ cluster, limit }) => {
     const client = getSupabaseClient();
     
+    // Normalize cluster label for consistent matching
+    const resolvedCluster = normalizeClusterLabel(cluster) || cluster;
+    
     const { data, error } = await client
       .from("seo_documents")
       .select("content, metadata")
-      .ilike("metadata->>cluster", `%${cluster}%`)
+      .ilike("metadata->>cluster", `%${resolvedCluster}%`)
       .order("metadata->>position", { ascending: true })
       .limit(limit || 50);
 
@@ -271,15 +353,21 @@ const analyzeContentTypesTool = new DynamicStructuredTool({
   }),
   func: async ({ cluster, query, intent, positionThreshold }) => {
     const client = getSupabaseClient();
+    
+    // Normalize cluster label (same as getTopPerformersTool)
+    const resolvedCluster =
+      normalizeClusterLabel(cluster) ||
+      ((query && (await detectClusterFromQuery(query))) || "");
+
     let dbQuery = client
       .from("seo_documents")
       .select("content, metadata")
       .lte("metadata->>position", positionThreshold || 10)
       .order("metadata->>position", { ascending: true })
-      .limit(100); // Increased to 100 for comprehensive analysis
+      .limit(100);
 
-    if (cluster) {
-      dbQuery = dbQuery.ilike("metadata->>cluster", `%${cluster}%`);
+    if (resolvedCluster) {
+      dbQuery = dbQuery.ilike("metadata->>cluster", `%${resolvedCluster}%`);
     }
     if (query) {
       dbQuery = dbQuery.ilike("metadata->>query", `%${query}%`);
@@ -291,35 +379,47 @@ const analyzeContentTypesTool = new DynamicStructuredTool({
     if (!data || data.length === 0) {
       return JSON.stringify({
         error: "No data found for analysis",
-        filters_used: { cluster, query, positionThreshold }
+        filters_used: { cluster: resolvedCluster, query, positionThreshold }
       });
     }
 
-    const {
-      resolvedIntent,
-      filteredItems: filteredData,
-      intentFilterApplied,
-      filteredOutCount,
-    } = await applyIntentFilterToItems({
-      query,
-      providedIntent: intent,
-      items: data,
-      toIntentItem: (row) => ({
-        domain: row.metadata.domain,
-        position: row.metadata.position,
-        snippet: row.content?.substring(0, 150) || "",
-      }),
-    });
+    // Only apply intent filtering when the user explicitly provides an intent parameter.
+    let filteredData = data;
+    let resolvedIntent: { intent: SearchIntentType; confidence: "low" | "medium" | "high" } = { intent: "unknown", confidence: "low" };
+    let intentFilterApplied = false;
+    let filteredOutCount = 0;
 
-    if (!filteredData.length) {
-      return JSON.stringify({
-        error: "No results match the detected intent",
-        intent: resolvedIntent.intent,
-        intent_filter_applied: intentFilterApplied,
-        filtered_out: filteredOutCount,
-        filters_used: { cluster, query, intent, positionThreshold },
+    if (intent) {
+      const filterResult = await applyIntentFilterToItems({
+        query,
+        providedIntent: intent,
+        items: data,
+        toIntentItem: (row) => ({
+          domain: row.metadata.domain,
+          position: row.metadata.position,
+          snippet: row.content?.substring(0, 150) || "",
+        }),
       });
+      resolvedIntent = filterResult.resolvedIntent;
+      filteredData = filterResult.filteredItems;
+      intentFilterApplied = filterResult.intentFilterApplied;
+      filteredOutCount = filterResult.filteredOutCount;
+
+      if (!filteredData.length) {
+        return JSON.stringify({
+          error: "No results match the specified intent",
+          intent: resolvedIntent.intent,
+          intent_filter_applied: intentFilterApplied,
+          filtered_out: filteredOutCount,
+          filters_used: { cluster, query, intent, positionThreshold },
+        });
+      }
     }
+
+    // Build intent instructions only if intent filtering was applied
+    const intentInstructions = intentFilterApplied
+      ? `\n${INTENT_DETECTION}\nDetected intent: ${resolvedIntent.intent}\nOnly include results that match this intent.`
+      : "";
 
     const contentAnalysisPrompt = `Analyze these search results and categorize each by content type. Use these categories:
 - recipe (cooking/food content)
@@ -333,12 +433,9 @@ const analyzeContentTypesTool = new DynamicStructuredTool({
 - product_page (e-commerce listings)
 - comparison_article (vs articles)
 - reference_guide (encyclopedic/wiki)
+${intentInstructions}
 
-${INTENT_DETECTION}
-Detected intent: ${resolvedIntent.intent}
-If intent is NOT "unknown", only include results that match the detected intent.
-
-Return JSON: {"content_type_analysis": [{"content_type": "recipe", "domain": "example.com", "position": 1, "confidence": "high", "reasoning": "brief explanation"}]}
+Return JSON of the type: {"content_type_analysis": [{"content_type": string, "domain": string, "position": number, "confidence": string, "reasoning": string}]}
 
 Results:
 ${filteredData.map((row, i) => `
@@ -431,6 +528,11 @@ const model = new ChatOpenAI({
   temperature: 0,
 });
 
+const cheapModel = new ChatOpenAI({
+  modelName: "gpt-4o-mini",
+  temperature: 0,
+});
+
 const modelWithTools = model.bindTools(retrievalTools);
 
 const routerSchema = z.object({
@@ -444,7 +546,7 @@ const routerParser = StructuredOutputParser.fromZodSchema(routerSchema);
 // 4. Define Graph Nodes
 // ============================================================================
 
-// ROUTER NODE: Classifies the query intent
+// ROUTER NODE: Classifies the query intent and detects cluster
 async function routerNode(state: SEOState): Promise<Partial<SEOState>> {
   // Include conversation history for context in routing
   const historyContext = state.conversationHistory.length > 0
@@ -460,21 +562,27 @@ async function routerNode(state: SEOState): Promise<Partial<SEOState>> {
     format_instructions: routerParser.getFormatInstructions(),
   });
 
-  const response = await model.invoke(input);
+  // Detect cluster and classify intent in parallel
+  const [response, clusterName] = await Promise.all([
+    cheapModel.invoke(input),
+    detectClusterFromQuery(state.query),
+  ]);
+  
   const decision = await routerParser.parse(response.content as string);
 
-  console.log(`[Router] Intent: ${decision.intent} - ${decision.explanation}`);
+  console.log(`[Router] Intent: ${decision.intent}, Cluster: ${clusterName || "none"} - ${decision.explanation}`);
 
   return {
     intent: decision.intent,
     routerExplanation: decision.explanation,
+    clusterName: clusterName || "",
   };
 }
 
 // STANDARD AGENT NODE: Uses tools to query the database flexibly
 async function standardAgentNode(state: SEOState): Promise<Partial<SEOState>> {
-  // Detect cluster from query for UI display
-  const clusterName = await detectClusterFromQuery(state.query);
+  // Use cluster from router (already detected)
+  const clusterName = state.clusterName;
 
   const systemPrompt = STANDARD_AGENT_PROMPT;
 
@@ -528,10 +636,9 @@ async function toolExecutorNode(state: SEOState): Promise<Partial<SEOState>> {
         case "analyze_content_types":
           {
             const analyzeArgs = toolCall.args as { cluster?: string; query?: string; intent?: string; positionThreshold?: number };
-            result = await analyzeContentTypesTool.invoke({
-              ...analyzeArgs,
-              query: analyzeArgs.query ?? state.query,
-            });
+            // Don't fallback to state.query - the user's meta-question won't match
+            // document query metadata. Only use query if agent explicitly provides one.
+            result = await analyzeContentTypesTool.invoke(analyzeArgs);
           }
           break;
         default:
@@ -595,8 +702,8 @@ function shouldContinueStandard(state: SEOState): "tools" | "respond" | "end" {
 async function strategyNode(state: SEOState): Promise<Partial<SEOState>> {
   const client = getSupabaseClient();
 
-  // Step 1: Identify the cluster from the query
-  const clusterName = await detectClusterFromQuery(state.query) || "General";
+  // Use cluster from router (already detected)
+  const clusterName = state.clusterName || "General";
 
   console.log(`[Strategy] Analyzing cluster: ${clusterName}`);
 
@@ -674,12 +781,29 @@ async function comparisonNode(state: SEOState): Promise<Partial<SEOState>> {
 
   console.log(`[Comparison] Time ranges:`, timeRanges);
 
-  // Detect cluster from query for UI display
-  const clusterName = await detectClusterFromQuery(state.query);
+  // Use cluster from router (already detected)
+  const clusterName = state.clusterName;
 
-  // Step 2: Get documents relevant to the query topic
-  const topicDocs = await vectorStore.similaritySearch(state.query, 5);
-  const relevantQueries = [...new Set(topicDocs.map((d) => d.metadata.query))];
+  // Step 2: Get relevant queries
+  let relevantQueries: string[] = [];
+  
+  if (clusterName) {
+    // Use cluster to find all queries within that cluster
+    const { data: clusterQueries } = await client
+      .from("seo_documents")
+      .select("metadata->>query")
+      .eq("metadata->>cluster", clusterName);
+    
+    relevantQueries = [...new Set((clusterQueries || []).map((r) => r.query).filter(Boolean))];
+    console.log(`[Comparison] Found ${relevantQueries.length} queries in cluster "${clusterName}"`);
+  }
+  
+  // Fallback to vector similarity if no cluster detected or no queries found
+  if (relevantQueries.length === 0) {
+    const topicDocs = await vectorStore.similaritySearch(state.query, 5);
+    relevantQueries = [...new Set(topicDocs.map((d) => d.metadata.query))];
+    console.log(`[Comparison] Falling back to vector search, found queries:`, relevantQueries);
+  }
 
   console.log(`[Comparison] Relevant queries:`, relevantQueries);
 
@@ -939,7 +1063,7 @@ Query: "${query}"
 ${intentParser.getFormatInstructions()}`;
 
   try {
-    const response = await model.invoke(prompt);
+    const response = await cheapModel.invoke(prompt);
     const parsed = await intentParser.parse(response.content as string);
     return { intent: parsed.intent, confidence: parsed.confidence };
   } catch {
@@ -988,7 +1112,7 @@ ${items
 ${filterParser.getFormatInstructions()}`;
 
   try {
-    const response = await model.invoke(prompt);
+    const response = await cheapModel.invoke(prompt);
     const parsed = await filterParser.parse(response.content as string);
     const keepIndices = new Set<number>();
     for (const index of parsed.keep || []) {
@@ -1060,7 +1184,7 @@ If the query mentions:
       "{format_instructions}",
       timeParser.getFormatInstructions()
     );
-    const response = await model.invoke(formatted);
+    const response = await cheapModel.invoke(formatted);
     const extracted = await timeParser.parse(response.content as string);
 
     if (extracted.hasTimeReference && extracted.earlierPeriod && extracted.laterPeriod) {
@@ -1246,10 +1370,57 @@ function normalizeHeaderToPattern(header: string): string {
   return header.slice(0, 50); // Return truncated original if no pattern match
 }
 
+function normalizeClusterLabel(raw: string | undefined): string {
+  if (!raw) return "";
+  const cleaned = raw.trim();
+  if (cleaned.length === 0) return "";
 
-// Detect cluster from query using vector store similarity search
+  return cleaned
+    .replace(/[-_]+/g, " ")
+    .replace(/^(cluster|niche)[:\-\s]+/i, "")
+    .replace(/(?:\s+|[-_]+)?(cluster|niche)$/i, "")
+    .trim();
+}
 
+async function extractClusterHint(query: string): Promise<string> {
+  const hintSchema = z.object({
+    cluster: z.string().optional(),
+  });
+  const hintParser = StructuredOutputParser.fromZodSchema(hintSchema);
+  const prompt = `Extract the explicit cluster or niche name if the user mentions one.
+- Return only the cluster name (no extra words like "cluster" or "niche").
+- Treat hyphenated (e.g., "pizza-cluster") as references to the cluster word (e.g., "pizza").
+- Return an empty string if no cluster or niche is mentioned.
+
+Query: "${query}"
+
+${hintParser.getFormatInstructions()}`;
+
+  try {
+    const response = await cheapModel.invoke(prompt);
+    const parsed = await hintParser.parse(response.content as string);
+    return normalizeClusterLabel(parsed.cluster);
+  } catch {
+    return "";
+  }
+}
+
+// Detect cluster from query using explicit hints first, then vector similarity
 async function detectClusterFromQuery(query: string, minSimilarityScore = 0.8): Promise<string> {
+  const clusterHint = await extractClusterHint(query);
+  if (clusterHint) {
+    const client = getSupabaseClient();
+    const { data, error } = await client
+      .from("seo_documents")
+      .select("metadata")
+      .eq("metadata->>cluster", clusterHint)
+      .limit(1);
+
+    if (!error && data && data.length > 0) {
+      return clusterHint;
+    }
+  }
+
   const vectorStore = await getVectorStore();
   const clusterSearch = await vectorStore.similaritySearchWithScore(query, 1);
   
