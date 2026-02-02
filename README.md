@@ -128,10 +128,12 @@ Here are some example queries you can try in the chat interface, categorized by 
 
 ## Screenshots
 
-<img src="https://github.com/user-attachments/assets/2c95efcc-dcad-4327-a8ce-21bdb24b5b09" />
-
 <img src="https://github.com/user-attachments/assets/977b0d29-c758-4555-bb39-3563b42ba94a" />
 
-<img src="https://github.com/user-attachments/assets/28788579-f92d-4672-b486-09a00625fdde" />
+<img src="https://github.com/user-attachments/assets/5e277d48-24a6-4ed1-9320-139e8ce63f3f" />
+
+<img src="https://github.com/user-attachments/assets/28788579-f92d-4672-b486-09a00625fdde" /> 
+
+<img src="https://github.com/user-attachments/assets/2c95efcc-dcad-4327-a8ce-21bdb24b5b09" />
 
 
