@@ -12,6 +12,7 @@ Write modular, scalable and maintainable code following these rules:
 - Do not add unnecessary comments; write self-explanatory code
 - Use descriptive names for variables, functions, and types
 - Avoid using hardcoded values; use constants or enums instead
+- Please, no default exports except of required by a framework
 
 - Keep components small and focused on a single responsibility
 - Extract reusable logic into helper functions or custom hooks
